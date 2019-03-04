@@ -1,0 +1,58 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    <mapper namespace="myWeb.qn215.dao.BillDao">
+    	<resultMap type="myWeb.qn215.entity.Bill" id="billmap">
+    		 <id column="id" property="id"/>
+        	 <result column="billCode" property="billCode"/>
+        	 <result column="productName" property="productName"/>
+        	 <result column="productDesc" property="productDesc"/>
+        	 <result column="productUnit" property="productUnit"/>
+        	 <result column="productCount" property="productCount"/>
+        	 <result column="totalPrice" property="totalPrice"/>
+        	 <result column="isPayment" property="isPayment"/>
+        	 <result column="creationDate" property="creationDate"/>
+        	 <result column="ProviderId" property="ProviderId"/>
+        	 <association property="provider" javaType="myWeb.qn215.entity.Provider" resultMap="providermap" />
+             <association property="fenye" javaType="myWeb.qn215.entity.Fenye"  />
+        	 	 
+    	</resultMap>
+    	
+    	<resultMap type="myWeb.qn215.entity.Provider" id="providermap">
+    		<id column="id" property="id"/>
+        	<result column="proCode" property="proCode"/>
+  			<result column="proName" property="proName"/>
+  			<result column="proDesc" property="proDesc"/>
+  			<result column="proContact" property="proContact"/>
+  			<result column="proPhone" property="proPhone"/>
+  			<result column="proAddress" property="proAddress"/>
+  			<result column="proFax" property="proFax"/>
+  			<result column="creationDate" property="creationDate"/>
+    	</resultMap>
+    
+    	<select id="selectBill" resultMap="billmap" parameterType="myWeb.qn215.entity.Bill">
+    		select a.id,a.billCode,a.productName,a.totalPrice,b.proName,a.isPayment,a.creationDate from smbms_bill a,smbms_provider b where a.providerId=b.id 
+    		<if test="productName!=null and productName!='' ">and productName like concat('%',#{productName},'%') </if>
+    		<if test="ProviderId !=0 and ProviderId !='' ">and providerId = #{ProviderId} </if>
+			<if test="isPayment!=0 and isPayment!='' ">and isPayment = #{isPayment} </if>
+    		 ORDER BY a.id asc
+    		 limit #{fenye.firstResult},#{fenye.billSize}
+    	</select>
+    	
+    	
+    	
+    	<!-- 根据ID查询 -->
+    	<select id="selectID" resultMap="billmap" parameterType="myWeb.qn215.entity.Bill">
+    		select a.id,a.billCode,a.productName,a.productUnit,a.productCount,b.proName,a.isPayment,a.totalPrice,a.creationDate from smbms_bill a,smbms_provider b where a.providerId=b.id and a.id=#{id}
+    	</select>
+    	
+    	
+    	<select id="selectprovider" resultMap="providermap">
+    		select id,proName from smbms_provider
+    	</select>
+    	
+    	<insert id="add"  parameterType="myWeb.qn215.entity.Provider" >
+    		insert into smbms_bill(billCode,productName,productUnit,productCount,totalPrice,providerId,isPayment) values(#{billCode},#{productName},#{productUnit},#{productCount},#{totalPrice},#{providerId},#{isPayment})
+    	</insert>
+    </mapper>
